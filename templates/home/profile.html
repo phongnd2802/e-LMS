@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ title }} - {% endblock %}
+
+{% block content %}
+<section>
+    <div class="container py-5">
+      <div class="row">
+        <div class="col-lg-4">
+          <div class="card mb-4">
+            <div class="card-body text-center">
+              <img src="{{ user.picture.url }}" alt="avatar"
+                class="rounded-circle img-fluid" style="width: 150px;">
+              <h5 class="my-3">{{ user.get_full_name }}</h5>
+              <p class="text-muted mb-1"><b>MSSV: </b> {{ user.username }}</p>
+
+              <a href="{% url 'change-password' %}"><i class="fas fa-lock-open"></i> Đổi mật khẩu</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-8">
+          <div class="card mb-4">
+            <div class="card-body">
+            <form action="" method="POST">
+                {% csrf_token %}
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">Tên</p>
+                </div>
+                <div class="col-sm-9">
+                    {{ form.first_name }}
+                </div>
+              </div>
+              <hr>
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">Họ và tên đệm</p>
+                </div>
+                <div class="col-sm-9">
+                    {{ form.last_name }}
+                </div>
+              </div>
+              <hr>
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">Email</p>
+                </div>
+                <div class="col-sm-9">
+                  {{ form.email }}
+                </div>
+              </div>
+              <hr>
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">Giới tính</p>
+                </div>
+                <div class="col-sm-9">
+                  {{ form.gender }}
+                </div>
+              </div>
+              <hr>
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">Khoa</p>
+                </div>
+                <div class="col-sm-9">
+                  {{ form.department }}
+                </div>
+              </div>
+              <hr>
+              {% include 'components/messages.html' %}
+              <button type="submit" class="btn btn-theme btn-block btn-form"  >Chỉnh sửa</button>
+            </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}

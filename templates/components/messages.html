@@ -1,0 +1,23 @@
+{% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{message.tags}} show-notification" role="alert">
+        <strong>{{ message }}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <script>
+        // Get the close button element
+        var closeButton = document.querySelector('.alert .btn-close');
+
+        // Add click event listener to the close button
+        closeButton.addEventListener('click', function() {
+            // Get the parent alert element
+            var alertElement = this.closest('.alert');
+            
+            // Hide the parent alert element
+            alertElement.style.display = 'none';
+        });
+    </script>
+    {% endfor %}
+{% endif %}

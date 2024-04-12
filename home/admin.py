@@ -1,3 +1,31 @@
 from django.contrib import admin
-
+from .models import User, Student, Department, Course, Submission, Announcement, Assignment
 # Register your models here.
+
+class UserAdmin(admin.ModelAdmin):
+    list_display = [
+        "get_full_name",
+        "username",
+        "gender",
+        "email",
+        "is_active",
+        "is_student",
+        "is_lecturer",
+        "department",
+    ]
+    search_fields = [
+        "username",
+        "first_name",
+        "last_name",
+        "email",
+        "is_active",
+        "is_lecturer",
+    ]
+
+admin.site.register(User, UserAdmin)
+admin.site.register(Student)
+admin.site.register(Department)
+admin.site.register(Course)
+admin.site.register(Submission)
+admin.site.register(Announcement)
+admin.site.register(Assignment)

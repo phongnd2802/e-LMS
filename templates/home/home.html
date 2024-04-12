@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+        <!-- banner section start -->
+        <section class="banner-section d-flex align-items-center position-relative">
+            
+          <div class="container">
+              <div class="row align-items-center">
+                  <div class="col-md-6">
+                      <div class="banner-text">
+                          <!-- <h2 class="mb-3">Tiêu đề ...</h2> -->
+                          <h1 class="mb-3 text-capitalize">Knowledge Hub</h1>
+                          <p class="mb-4">
+                              Tại Knowledge Hub, chúng tôi tin rằng mỗi cá nhân có quyền
+                              truy cập vào kiến thức và cơ hội phát triển bản thân.
+                              Với một thư viện học liệu đa dạng, các khóa học chất lượng,
+                              và một cộng đồng học tập mở và chia sẻ, chúng tôi cam kết mang
+                              đến cho bạn trải nghiệm học tập đầy cảm hứng và hiệu quả.
+
+                              Hãy tham gia vào hành trình khám phá kiến thức mới, phát triển kỹ năng
+                              và mở rộng tầm nhìn của bạn cùng với Knowledge Hub ngay hôm nay!
+                          </p>
+                          <a href="#" class="btn btn-theme">join for free</a>
+                      </div>
+                  </div>
+                  <div class="col-md-6 order-first order-md-last mb-5 mb-md-0">
+                      <div class="banner-img">
+                        <div class="circular-img">
+                          <div class="circular-img-inner">
+                            <div class="circular-img-circle"></div>
+                            <img src="{% static 'img/banner-img.png' %}" alt="banner img">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+              </div>
+          </div>
+      </section>
+      <!-- banner section end -->
+
+
+      <!-- fun facts section start -->
+      <section class="fun-facts-section">
+        <div class="container">
+          <div class="box py-2">
+            <div class="row text-center">
+              <div class="col-md-6 col-lg-3">
+                <div class="fun-facts-item">
+                  <h2 class="style-1">{{ students }}</h2>
+                  <p>Người học</p>
+                </div>
+              </div>
+              <div class="col-md-6 col-lg-3">
+                <div class="fun-facts-item">
+                  <h2 class="style-2">{{ courses }}</h2>
+                  <p>Khóa học</p>
+                </div>
+              </div>
+              <!-- <div class="col-md-6 col-lg-3">
+                <div class="fun-facts-item">
+                  <h2 class="style-3">30+</h2>
+                  <p>countries</p>
+                </div>
+              </div> -->
+              <div class="col-md-6 col-lg-3">
+                <div class="fun-facts-item">
+                  <h2 class="style-4">{{ lecturers }}</h2>
+                  <p>Giảng viên</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- fun facts section end -->
+
+      <!-- courses section start -->
+      <section class="courses-section section-padding">
+        <div class="container">
+          <div class="row justify-content-center">
+            <div class="col-md-8">
+              <div class="section-title text-center">
+                <h2 class="title">Khóa học</h2>
+                <p class="sub-title">Tìm khóa học phù hợp nhất với bạn</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+                      <!-- courses-item start -->
+        <div class="col-md-6 col-lg-3">
+          <div class="courses-item">
+            <a href="#" class="link">
+              <div class="courses-item-inner">
+                <div class="img-box">
+                  <img src="{% static 'img/courses/web-development/1.jpg' %}" alt="courses img">
+                </div>
+                <h3 class="title">Web Design for beginners</h3>
+                <div class="instructor">
+                  <img src="{% static 'img/instructor/1.png' %}" alt="instructor img">
+                  <span class="instructor-name">Dip Dutta</span>
+                </div>
+                <div class="rating">
+                  <span class="average-rating">(4.5)</span>
+                  <span class="avarage-stars">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star-half-alt"></i>
+                  </span>
+                  <span class="reviews">(20)</span>
+                </div>
+                <div class="price">Upcoming</div>
+              </div>
+            </a>
+          </div>
+        </div>
+        <!-- courses-item end -->
+                     <!-- courses-item start -->
+                     <div class="col-md-6 col-lg-3">
+                      <div class="courses-item">
+                        <a href="#" class="link">
+                          <div class="courses-item-inner">
+                            <div class="img-box">
+                              <img src="{% static 'img/courses/web-development/2.jpg' %}" alt="courses img">
+                            </div>
+                            <h3 class="title">Learn English with British Council teachers</h3>
+                            <div class="instructor">
+                              <img src="{% static 'img/instructor/1.png' %}" alt="instructor img">
+                              <span class="instructor-name">Shuvo Das</span>
+                            </div>
+                            <div class="rating">
+                              <span class="average-rating">(4.5)</span>
+                              <span class="avarage-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                              </span>
+                              <span class="reviews">(110)</span>
+                            </div>
+                            <div class="price">$ 90</div>
+                          </div>
+                        </a>
+                      </div>
+                    </div>
+                    <!-- courses-item end -->
+            <!-- courses-item start -->
+            <div class="col-md-6 col-lg-3">
+              <div class="courses-item">
+                <a href="#" class="link">
+                  <div class="courses-item-inner">
+                    <div class="img-box">
+                      <img src="{% static 'img/courses/web-development/3.jpg' %}" alt="courses img">
+                    </div>
+                    <h3 class="title">Microsoft Office For Beginners</h3>
+                    <div class="instructor">
+                      <img src="{% static 'img/instructor/1.png' %}" alt="instructor img">
+                      <span class="instructor-name">Nitu</span>
+                    </div>
+                    <div class="rating">
+                      <span class="average-rating">(4.5)</span>
+                      <span class="avarage-stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                      </span>
+                      <span class="reviews">(50)</span>
+                    </div>
+                    <div class="price">$ 90</div>
+                  </div>
+                </a>
+              </div>
+            </div>
+            <!-- courses-item end -->
+            <!-- courses-item start -->
+            <div class="col-md-6 col-lg-3">
+              <div class="courses-item">
+                <a href="#" class="link">
+                  <div class="courses-item-inner">
+                    <div class="img-box">
+                      <img src="{% static 'img/courses/web-development/4.jpg' %}" alt="courses img">
+                    </div>
+                    <h3 class="title">Graphic Design For Beginners</h3>
+                    <div class="instructor">
+                      <img src="{% static 'img/instructor/1.png' %}" alt="instructor img">
+                      <span class="instructor-name">Akhi</span>
+                    </div>
+                    <div class="rating">
+                      <span class="average-rating">(4.5)</span>
+                      <span class="avarage-stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                      </span>
+                      <span class="reviews">(230)</span>
+                    </div>
+                    <div class="price">$ 100</div>
+                  </div>
+                </a>
+              </div>
+            </div>
+            <!-- courses-item end -->
+          </div>
+          <div class="row">
+            <div class="col-12 text-center mt-3">
+              <a href="#" class="btn btn-theme">view all courses</a>
+            </div>
+          </div>
+        </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- courses section end -->
+
+{% endblock %}

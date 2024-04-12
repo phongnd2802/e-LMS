@@ -2,8 +2,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 GENDERS = (
-    ("M", "Male"),
-    ("F", "Female"),
+    ("M", "Nam"),
+    ("F", "Nữ"),
 )
 
 class Department(models.Model):
@@ -23,7 +23,7 @@ class User(AbstractUser):
         upload_to='profile_pictures/', default="profile_pictures/default.png", null=True
     )
     email = models.EmailField(blank=True, null=True)
-    department = models.ForeignKey(Department, on_delete=models.CASCADE, null=False, blank=False)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
         ordering = ('-date_joined',)
@@ -179,7 +179,7 @@ class Submission(models.Model):
         super().delete(*args, **kwargs)
 
     class Meta:
-        ordering = ('-submited_date')
+        ordering = ('-submited_date',)
 
     
 
