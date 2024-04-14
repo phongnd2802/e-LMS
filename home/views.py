@@ -1,11 +1,17 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import auth, messages
-from .models import User, Course
-from .forms import RegisterForm, LoginForm, ProfileUpdateForm, ChangePasswordForm
-from admin_soft.views import logout_view
+from .models import User, Course, Lecturer, Assignment, Material, Announcement, Student
+from .forms import (
+    RegisterForm, LoginForm,
+    ProfileUpdateForm, ChangePasswordForm,
+    LecturerRegisterForm, MaterialAddForm
+)
+from django.db.models import Count
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
+from .decorators import lecturer_required
+from django.template.defaulttags import register
+
 # Create your views here.
 def home(request):
     students = User.objects.filter(is_student=True).count()
@@ -38,10 +44,7 @@ def login(request):
             
             if user is not None:
                 auth.login(request, user)
-                if user.is_superuser:
-                    return redirect('index')
-                else:
-                    return redirect('home')
+                return redirect('home')
             else:
                 messages.error(request, f'Tên đăng nhập hoặc mật khẩu không đúng')
                 return redirect('login')
@@ -58,7 +61,7 @@ def login(request):
     )
 
 
-def register(request):
+def register_user(request):
     if request.user.is_authenticated:
         return redirect('home')
     
@@ -89,6 +92,35 @@ def register(request):
         'home/register.html',
         context
     )
+
+def sign_up_lecturer(request):
+    if request.method == 'POST':
+        form = LecturerRegisterForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request,
+                'Đã đăng kí thông tin, hãy chờ quản trị viên xem xét đăng kí của bạn!'
+            )
+            return redirect('sign-up-lecturer')
+        else:
+            messages.error(
+                request,
+                f'Đã có lỗi xảy ra!'
+            )
+            return redirect('sign-up-lecturer')
+    else:
+        form = LecturerRegisterForm()
+    context = {
+        "title": "Đăng kí giảng viên",
+        "form": form,
+    }
+    return render(
+        request,
+        'home/sign-up-lecturer.html',
+        context
+    )
+
 
 def logout_view(request):
     if request.user.is_authenticated:
@@ -143,5 +175,91 @@ def change_password(request):
     return render(
         request,
         'home/change-password.html',
+       context,
+    )
+
+@login_required
+@lecturer_required
+def lecturer_courses(request):
+    user = get_object_or_404(User, is_lecturer=True, pk=request.user.id)
+    lecturer = Lecturer.objects.get(lecturer=user)
+    courses = Course.objects.filter(lecturer=lecturer)
+
+    student_count = courses.annotate(student_count=Count('student'))
+
+    student_each_course = {}
+    for course in student_count:
+        student_each_course[course.code] = course.student_count
+    
+    @register.filter
+    def get_item(dictionary, course_code):
+        return dictionary.get(course_code)
+    
+
+    context = {
+        "title": "Khóa học của tôi",
+        "lecturer": lecturer,
+        "courses": courses,
+        "student_count": student_each_course,
+    }
+    return render(
+        request,
+        'home/lecturer-courses.html',
+        context
+    )
+
+@login_required
+@lecturer_required
+def course_page_lecturer(request, code):
+    course = Course.objects.get(code=code)
+    try:
+        announcements = Announcement.objects.filter(course_code=course)
+        assignments = Assignment.objects.filter(course_code=course)
+        materials = Material.objects.filter(course_code=course)
+        student_count = Student.objects.filter(course=course).count()
+    except:
+        announcements = None
+        assignments = None
+        materials = None
+        student_count = 0
+    print(announcements)
+    print(assignments)
+    context =  {
+        "title": course.name,
+        "announcements": announcements,
+        "assignments": assignments,
+        "marerials": materials,
+        "student_count": student_count,
+        "course": course,
+    }
+    return render(
+        request,
+        'home/course-page-lecturer.html',
         context,
     )
+
+@login_required
+@lecturer_required
+def add_course_material(request, code):
+    if request.method == 'POST':
+        form = MaterialAddForm(request.POST, request.FILES)
+        form.instance.course_code = Course.objects.get(code=code)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Đã thêm thành công!')
+            return redirect('add-course-material' + str(code))
+        else:
+            messages.error(request, 'Đã có lỗi xảy ra!')
+            return redirect('add-course-material' + str(code))
+    else:
+        form = MaterialAddForm()
+    context = {
+        "title": "Thêm tài liệu & video",
+        "form": form,
+    }
+    return render(
+        request,
+        'home/course-material.html',
+        context
+    )
+

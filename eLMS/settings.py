@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'discussion.apps.DiscussionConfig',
     'home.apps.HomeConfig',
     'quiz.apps.QuizConfig',
+    'froala_editor',
 ]
 
 MIDDLEWARE = [
@@ -53,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'home.middleware.RedirectAdminMiddleWare',
 ]
 
 ROOT_URLCONF = 'eLMS.urls'

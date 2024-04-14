@@ -56,14 +56,26 @@ class User(AbstractUser):
 
     
 
+class Lecturer(models.Model):
+    lecturer = models.OneToOneField(User, on_delete=models.CASCADE)
+    degree = models.ImageField(upload_to='degree/', blank=False, null=False)
+    is_approved = models.BooleanField(null=False, blank=False, default=False)
+
+    class Meta:
+        ordering = ('-lecturer__date_joined',)
+    
+    def __str__(self):
+        return self.lecturer.get_full_name
+
 class Course(models.Model):
     code = models.CharField(max_length=50, unique=True)
     name = models.CharField(max_length=255, null=False)
     department = models.ForeignKey(
         Department, on_delete=models.CASCADE, null=False, related_name='courses'
     )
+    picture = models.ImageField(upload_to='courses/', default='courses/default.jpg', null=True)
     lecturer = models.ForeignKey(
-        User, on_delete=models.SET_NULL, null=True, blank=True
+        Lecturer, on_delete=models.SET_NULL, null=True, blank=True
     )
     student_key = models.CharField(max_length=100, null=True, blank=True)
     lecturer_key = models.CharField(max_length=100, null=True, blank=True)
@@ -86,6 +98,7 @@ class Student(models.Model):
     def __str__(self):
         return self.student.get_full_name
     
+
 
 
 class Announcement(models.Model):
@@ -188,7 +201,7 @@ class Material(models.Model):
         Course, on_delete=models.CASCADE, null=False
     )
     title = models.CharField(max_length=255, null=True, blank=True)
-    description = models.TextField(max_length=2000, null=False)
+    description = models.TextField(max_length=5000, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=False)
     file = models.FileField(upload_to='materials/', null=True, blank=True)
 

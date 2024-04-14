@@ -14,7 +14,18 @@
             </button>
             <ul class="menu">
                 <li class="menu-item"><a href="{% url 'home' %}">Trang chủ</a></li>
-                <li class="menu-item"><a href="#">Khóa học</a></li>
+                {% if user.is_authenticated %}
+                    {% if user.is_lecturer %}
+                    <li class="menu-item"><a href="{% url 'lecturer-courses' %}">Khóa học</a></li>
+
+                    {% elif user.is_student %}
+                    <li class="menu-item"><a href="#">Khóa học</a></li>
+                    {% else %}
+                    <li class="menu-item"><a href="{% url 'index' %}">Quản lý các khóa học</a></li>
+                    {% endif %}
+                {% else %}
+                    <li class="menu-item"><a href="{% url 'login' %}">Khóa học</a></li>
+                {% endif %}
                 <li class="menu-item"><a href="#">Liên hệ</a></li>
                 <li class="menu-item menu-item menu-item-has-children">
                     {% if user.is_authenticated %}
@@ -28,6 +39,7 @@
                     <ul class="sub-menu js-sub-menu">
                         <li class="sub-menu-item"><a href="{% url 'login' %}">Đăng nhập</a></li>
                         <li class="sub-menu-item"><a href="{% url 'sign-up' %}">Đăng kí</a></li>
+                        <li class="sub-menu-item"><a href="{% url 'sign-up-lecturer' %}">Đăng kí (giảng viên)</a></li>
                     </ul>
                     {% endif %}
                 </li>

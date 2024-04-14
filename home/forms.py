@@ -1,6 +1,100 @@
+from typing import Any
 from django import forms
-from .models import User, Student, GENDERS, Department
+from .models import User, Student, GENDERS, Department, Course, Lecturer, Material
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, PasswordChangeForm
+from froala_editor.widgets import FroalaEditor
+
+class LecturerRegisterForm(UserCreationForm):
+    full_name = forms.CharField(
+        max_length=200,
+        widget=forms.TextInput(
+            attrs={
+                "type": "text",
+                "class": "form-control",
+                "placeholder": "Họ và tên",
+            }
+        )
+    )
+    username = forms.CharField(
+        max_length=30,
+        widget=forms.TextInput(
+            attrs={
+                "type": "text",
+                "class": "form-control",
+                "placeholder": "Tên đăng nhập",
+            }
+        )
+    )
+
+    email = forms.EmailField(
+        widget=forms.TextInput(
+            attrs={
+                "type": "email",
+                "class": "form-control",
+                "placeholder": "Email",
+            }
+        )
+    )
+
+    password1 = forms.CharField(
+        max_length=100,
+        widget=forms.TextInput(
+            attrs={
+                "type": "password",
+                "class": "form-control",
+                "placeholder": "Mật khẩu"
+            }
+        ),
+    )
+
+    password2 = forms.CharField(
+        max_length=100,
+        widget=forms.TextInput(
+            attrs={
+                "type": "password",
+                "class": "form-control",
+                "placeholder": "Xác nhận mật khẩu"
+            }
+        ),
+    )
+
+    degree = forms.ImageField(
+       required=True,
+    )
+
+    picture = forms.ImageField(
+        required=False,
+    )
+
+    class Meta(UserCreationForm.Meta):
+        model = User
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        full_name = str(self.cleaned_data.get('full_name'))
+        first_name = full_name.split()[-1]
+        last_name = ' '.join(full_name.split()[:-1])
+        print(first_name, last_name)
+        user.first_name = first_name
+        user.last_name = last_name
+        user.username = self.cleaned_data.get('username')
+        user.email = self.cleaned_data.get('email')
+        user.picture = self.cleaned_data.get('picture')
+
+        password = self.cleaned_data.get('password1')
+        user.set_password(password)
+        if commit:
+            user.save()
+            Lecturer.objects.create(
+                lecturer=user,
+                degree=self.cleaned_data.get('degree'),
+                is_approved=False,
+            )
+
+        return user
+
+    
+
 
 class RegisterForm(UserCreationForm):
     username = forms.CharField(
@@ -181,3 +275,82 @@ class ChangePasswordForm(PasswordChangeForm):
             "new_password1",
             "new_passwrod2",
         ]
+
+class StudentAddForm(forms.ModelForm):
+    student = forms.ModelChoiceField(queryset=User.objects.filter(is_student=False, is_lecturer=False))
+
+    class Meta:
+        model = Student
+        fields = '__all__'
+
+
+class LecturerAddForm(forms.ModelForm):
+    lecturer = forms.ModelChoiceField(queryset=User.objects.filter(is_student=False, is_lecturer=False))
+    department = forms.ModelChoiceField(queryset=Department.objects.all())
+
+    class Meta:
+        model = Lecturer
+        fields = '__all__'
+
+
+    def save(self, commit=True):
+        lecturer_instance = super().save(commit=False)
+
+        if lecturer_instance.is_approved:
+            # Nếu is_approved của giáo viên được đặt thành True
+            user_instance = lecturer_instance.lecturer
+            user_instance.is_lecturer = True
+            
+            if self.cleaned_data.get('department'):
+                # Nếu department của giáo viên được đặt
+                user_instance.department = self.cleaned_data.get('department')
+
+            user_instance.save()
+
+        if commit:
+            lecturer_instance.save()
+        
+        return lecturer_instance
+        
+    
+class MaterialAddForm(forms.ModelForm):
+    title = forms.CharField(
+        max_length=1000,
+        widget=forms.TextInput(attrs={
+            "type": "text",
+            "class": "form-control",
+            "placeholder": "Tiêu đề"
+        }
+        )
+    )
+
+    file = forms.FileField(
+        max_length=2000,
+        widget=forms.FileInput(attrs={
+            "class": "form-control",
+        })
+    )
+
+    class Meta:
+        model = Material
+        fields = '__all__'
+        widgets = {
+            'description': FroalaEditor(),
+            'file': forms.FileInput(attrs={'class': 'form-control', 'id': 'file', 'name': 'file', 'aria-describedby': 'file', 'aria-label': 'Upload'}),
+        }
+
+    
+
+
+    
+
+
+
+
+
+    
+
+    class Meta:
+        model = Material
+        fields = '__all__'
+
