@@ -33,8 +33,13 @@ class LecturerAdmin(admin.ModelAdmin):
         "lecturer",
         "is_approved",
     ]
-
     form = LecturerAddForm
+
+class AnnouncementAdmin(admin.ModelAdmin):
+    list_display = [
+        "description",
+        "post_date",
+    ]
 
 
 admin.site.register(User, UserAdmin)
@@ -42,6 +47,6 @@ admin.site.register(Student, StudentAdmin)
 admin.site.register(Department)
 admin.site.register(Course)
 admin.site.register(Submission)
-admin.site.register(Announcement)
+admin.site.register(Announcement, AnnouncementAdmin)
 admin.site.register(Assignment)
 admin.site.register(Lecturer, LecturerAdmin)

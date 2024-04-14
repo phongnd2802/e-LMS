@@ -110,7 +110,7 @@ class Announcement(models.Model):
         ordering = ('-created_at',)
     
     def __str__(self):
-        return self.created_at.strftime("%d-%m-%Y, %H:%M:%S")
+        return self.description
     
     @property
     def post_date(self):
@@ -203,7 +203,7 @@ class Material(models.Model):
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(max_length=5000, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=False)
-    file = models.FileField(upload_to='materials/', null=True, blank=True)
+    #file = models.FileField(upload_to='materials/', null=True, blank=True)
 
 
     class Meta:
@@ -212,12 +212,32 @@ class Material(models.Model):
     def __str__(self):
         return self.title
     
+
+    @property
+    def post_date(self):
+        return self.created_at.strftime("%d-%m-%Y, %H:%M:%S")
+
+
+class MaterialDetail(models.Model):
+    name = models.CharField(max_length=1000, null=False, blank=False)
+    description = models.TextField(max_length=5000, null=True, blank=True)
+    url = models.URLField(null=True, blank=True)
+    file = models.FileField(upload_to='materials/', null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=False)
+    updated_at = models.DateTimeField(auto_now=True)
+    material = models.ForeignKey(Material, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        ordering = ('-created_at',)
+    
     def delete(self, *args, **kwargs):
         self.file.delete()
         super().delete(*args, **kwargs)
 
     @property
     def post_date(self):
-        return self.created_at.strftime("%d-%m-%Y, %H:%M:%S")
-
+        return self.updated_at.strftime("%d-%m-%Y, %H:%M:%S")
 

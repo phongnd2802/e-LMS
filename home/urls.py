@@ -14,4 +14,9 @@ urlpatterns = [
     path('lecturer-courses/', views.lecturer_courses, name='lecturer-courses'),
     path('course-page-lecturer/<str:code>/', views.course_page_lecturer, name='course-page-lecturer'),
     path('course-page-lecturer/<str:code>/add-material/', views.add_course_material, name='add-course-material'),
+    path('course-page-leturer/<str:code>/<int:pk>/edit/', views.edit_course_material, name='edit-course-material'),
+    path('course-page-lecturer/<str:code>/<int:pk>/delete/', views.delete_course_material, name='delete-course-material'),
+    path('course-page-lecturer/<str:code>/<int:material_id>/add/', views.add_course_material_detail, name='add-course-material-detail'),
+    path('course-page-lecturer/<str:code>/<int:material_id>/<int:detail_id>/edit/', views.edit_course_material_detail, name='edit-course-material-detail'),
+    path('course-page-lecturer/<str:code>/<int:material_id>/<int:detail_id>/delete/', views.delete_course_material_detail, name='delete-course-material-detail'),
 ]

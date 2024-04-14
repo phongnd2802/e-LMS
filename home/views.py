@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import auth, messages
-from .models import User, Course, Lecturer, Assignment, Material, Announcement, Student
+from .models import User, Course, Lecturer, Assignment, Material, Announcement, Student, MaterialDetail
 from .forms import (
     RegisterForm, LoginForm,
     ProfileUpdateForm, ChangePasswordForm,
-    LecturerRegisterForm, MaterialAddForm
+    LecturerRegisterForm, MaterialAddForm, MaterialDetailAddForm
 )
 from django.db.models import Count
 from django.contrib.auth.decorators import login_required
@@ -215,20 +215,22 @@ def course_page_lecturer(request, code):
     try:
         announcements = Announcement.objects.filter(course_code=course)
         assignments = Assignment.objects.filter(course_code=course)
-        materials = Material.objects.filter(course_code=course)
+        materials = Material.objects.filter(course_code=course).order_by('created_at')
         student_count = Student.objects.filter(course=course).count()
+        materials_detail = MaterialDetail.objects.filter(material_id__in=materials.values_list('pk', flat=True)).order_by('created_at')
     except:
         announcements = None
         assignments = None
         materials = None
+        materials_detail = None
         student_count = 0
-    print(announcements)
-    print(assignments)
+    print(materials_detail)
     context =  {
         "title": course.name,
         "announcements": announcements,
         "assignments": assignments,
-        "marerials": materials,
+        "materials": materials,
+        "materials_detail": materials_detail,
         "student_count": student_count,
         "course": course,
     }
@@ -242,20 +244,21 @@ def course_page_lecturer(request, code):
 @lecturer_required
 def add_course_material(request, code):
     if request.method == 'POST':
-        form = MaterialAddForm(request.POST, request.FILES)
+        form = MaterialAddForm(request.POST)
         form.instance.course_code = Course.objects.get(code=code)
         if form.is_valid():
             form.save()
             messages.success(request, 'Đã thêm thành công!')
-            return redirect('add-course-material' + str(code))
+            return redirect('course-page-lecturer', code=code)
         else:
             messages.error(request, 'Đã có lỗi xảy ra!')
-            return redirect('add-course-material' + str(code))
+            return redirect('add-course-material', code=code)
     else:
         form = MaterialAddForm()
     context = {
         "title": "Thêm tài liệu & video",
         "form": form,
+        "action": "Thêm"
     }
     return render(
         request,
@@ -263,3 +266,96 @@ def add_course_material(request, code):
         context
     )
 
+@login_required
+@lecturer_required
+def edit_course_material(request, code, pk):
+    instance = get_object_or_404(Material, pk=pk)
+    if request.method == 'POST':
+        pass
+    else:
+        form = MaterialAddForm(instance=instance)
+    context = {
+        "title": f"{instance.title}",
+        "form": form,
+        "action": "Edit",
+    }    
+    return render(
+        request,
+        'home/course-material.html',
+        context,
+    )
+
+@login_required
+@lecturer_required
+def delete_course_material(request, code, pk):
+    instance = Material.objects.get(pk=pk)
+    instance.delete()
+    messages.success(request, 'Đã xóa thành công!')
+    return redirect('course-page-lecturer', code=code)
+
+
+@login_required
+@lecturer_required
+def add_course_material_detail(request, code, material_id):
+    material = Material.objects.get(pk=material_id)
+    course = Course.objects.get(code=code)
+    if request.method == 'POST':
+        form = MaterialDetailAddForm(request.POST, request.FILES)
+        form.instance.material = material
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Đã thêm tài liệu cho {material.title} thành công!')
+            return redirect('course-page-lecturer', code=code)
+        else:
+            messages.error(request, 'Thông tin không hợp lệ!')
+            return redirect('add-course-material-detail', code=code, material_id=material_id)
+    else:
+        form = MaterialDetailAddForm()
+    context = {
+        "title": f'{material.title} | Thêm',
+        "form": form,
+        "material": material,
+        "course": course,
+        "action": "Thêm",
+    }
+    return render(
+        request,
+        'home/add-course-material.html',
+        context,
+    )
+
+
+@login_required
+@lecturer_required
+def edit_course_material_detail(request, code, material_id, detail_id):
+    material = Material.objects.get(pk=material_id)
+    instance = get_object_or_404(MaterialDetail, pk=detail_id)
+    if request.method == 'POST':
+        form = MaterialDetailAddForm(request.POST, request.FILES, instance=instance)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Đã chỉnh sửa thành công!')
+            return redirect('course-page-lecturer', code=code)
+        else:
+            messages.error(request, 'Lỗi!')
+            return redirect('edit-course-material-detail', code=code, material_id=material_id, detail_id=detail_id)
+    else:
+        form = MaterialDetailAddForm(instance=instance)
+    context = {
+        "title": f'{material.title} | Edit',
+        "form": form,
+        "action": "Edit",
+    }
+    return render(
+        request,
+        'home/add-course-material.html',
+        context,
+    )
+
+@login_required
+@lecturer_required
+def delete_course_material_detail(request, code, material_id, detail_id):
+    instance = get_object_or_404(MaterialDetail, pk=detail_id)
+    instance.delete()
+    messages.success(request, 'Đã xóa thành công!')
+    return redirect('course-page-lecturer', code=code)

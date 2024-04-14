@@ -1,8 +1,8 @@
-from typing import Any
 from django import forms
-from .models import User, Student, GENDERS, Department, Course, Lecturer, Material
+from .models import User, Student, GENDERS, Department, Course, Lecturer, Material, MaterialDetail
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, PasswordChangeForm
 from froala_editor.widgets import FroalaEditor
+from django.forms import inlineformset_factory
 
 class LecturerRegisterForm(UserCreationForm):
     full_name = forms.CharField(
@@ -312,7 +312,7 @@ class LecturerAddForm(forms.ModelForm):
         
         return lecturer_instance
         
-    
+
 class MaterialAddForm(forms.ModelForm):
     title = forms.CharField(
         max_length=1000,
@@ -323,34 +323,54 @@ class MaterialAddForm(forms.ModelForm):
         }
         )
     )
+    description = forms.CharField(
+        widget=FroalaEditor,
+        required=False,
+    )
+    class Meta:
+        model = Material
+        fields = ('title', 'description')
 
+
+class MaterialDetailAddForm(forms.ModelForm):
+    name = forms.CharField(
+        max_length=1000,
+        widget=forms.TextInput(
+            attrs={
+                "type": "text",
+                "class": "form-control",
+                "placeholder": "Tên tài liệu & video",
+            }
+        )
+    )
+    description = forms.CharField(
+        widget=FroalaEditor,
+        required=False
+    )
+
+    url = forms.URLField(
+        widget=forms.URLInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Link tài liệu, video",
+            }
+        ),
+        required=False,
+    )
     file = forms.FileField(
-        max_length=2000,
-        widget=forms.FileInput(attrs={
-            "class": "form-control",
-        })
+        widget=forms.FileInput(
+            attrs={
+                "class": "form-control",
+            }
+        ),
+        required=False
     )
 
     class Meta:
-        model = Material
-        fields = '__all__'
-        widgets = {
-            'description': FroalaEditor(),
-            'file': forms.FileInput(attrs={'class': 'form-control', 'id': 'file', 'name': 'file', 'aria-describedby': 'file', 'aria-label': 'Upload'}),
-        }
-
-    
-
-
-    
-
-
-
-
-
-    
-
-    class Meta:
-        model = Material
-        fields = '__all__'
-
+        model = MaterialDetail
+        fields = [
+            "name",
+            "description",
+            "url",
+            "file",
+        ]
