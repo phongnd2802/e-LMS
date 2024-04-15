@@ -528,9 +528,16 @@ def delete_annoucement(request, code, pk):
 
 
 def course_detail(request, code):
-    course = get_object_or_404(Course, code=code)
-    materials = Material.objects.filter(course_code=course).order_by('created_at')
-    materials_detail = MaterialDetail.objects.filter(material_id__in=materials.values_list('pk', flat=True)).order_by('created_at')
+    if request.user.is_authenticated:
+        student = Student.objects.get(student=request.user)
+        courses = student.course.all()
+        course = get_object_or_404(Course, code=code)
+        if course in courses:
+            return redirect('course-page', code=code)
+    else:
+        course = get_object_or_404(Course, code=code)
+        materials = Material.objects.filter(course_code=course).order_by('created_at')
+        materials_detail = MaterialDetail.objects.filter(material_id__in=materials.values_list('pk', flat=True)).order_by('created_at')
     context = {
         "title": course.name,
         "course": course,
