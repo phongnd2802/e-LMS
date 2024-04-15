@@ -4,7 +4,8 @@ from .models import User, Course, Lecturer, Assignment, Material, Announcement, 
 from .forms import (
     RegisterForm, LoginForm,
     ProfileUpdateForm, ChangePasswordForm,
-    LecturerRegisterForm, MaterialAddForm, MaterialDetailAddForm
+    LecturerRegisterForm, MaterialAddForm, MaterialDetailAddForm,
+    AssignmentAddForm, AnnouncementForm
 )
 from django.db.models import Count
 from django.contrib.auth.decorators import login_required
@@ -179,6 +180,17 @@ def change_password(request):
     )
 
 @login_required
+def student_courses(request):
+    
+    context = {}
+    return render(
+        request,
+        'home/student-courses.html',
+        context,
+    )
+
+
+@login_required
 @lecturer_required
 def lecturer_courses(request):
     user = get_object_or_404(User, is_lecturer=True, pk=request.user.id)
@@ -214,7 +226,7 @@ def course_page_lecturer(request, code):
     course = Course.objects.get(code=code)
     try:
         announcements = Announcement.objects.filter(course_code=course)
-        assignments = Assignment.objects.filter(course_code=course)
+        assignments = Assignment.objects.filter(course_code=course).order_by('created_at')
         materials = Material.objects.filter(course_code=course).order_by('created_at')
         student_count = Student.objects.filter(course=course).count()
         materials_detail = MaterialDetail.objects.filter(material_id__in=materials.values_list('pk', flat=True)).order_by('created_at')
@@ -359,3 +371,129 @@ def delete_course_material_detail(request, code, material_id, detail_id):
     instance.delete()
     messages.success(request, 'Đã xóa thành công!')
     return redirect('course-page-lecturer', code=code)
+
+
+@login_required
+@lecturer_required
+def add_assignment(request, code):
+    course = get_object_or_404(Course, code=code)
+    if request.method == 'POST':
+        form = AssignmentAddForm(request.POST, request.FILES)
+        form.instance.course_code = course
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Đã tạo bài tập thành công!')
+            return redirect('course-page-lecturer', code=code)
+        else:
+            messages.error(request, 'Lỗi!')
+            return redirect('add-assignment', code=code)
+    else:
+        form = AssignmentAddForm()
+    context = {
+        "title": "Tạo bài tập",
+        "form": form,
+        "action": "Thêm",
+    }
+    return render(
+        request,
+        'home/assignment.html',
+        context,
+    )
+
+@login_required
+@lecturer_required
+def edit_assignment(request, code, pk):
+    course = get_object_or_404(Course, code=code)
+    instance = get_object_or_404(Assignment, pk=pk)
+    if request.method == 'POST':
+        form = AssignmentAddForm(request.POST, request.FILES, instance=instance)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Đã cập nhật thành công!')
+            return redirect('course-page-lecturer', code=code)
+        else:
+            messages.error(request, 'Đã có lỗi!')
+            return redirect('edit-assignment', code=code, pk=pk)
+    else:
+        form = AssignmentAddForm(instance=instance)
+    context = {
+        "title": "Edit",
+        "form": form,
+        "action": "Edit",
+    }
+    return render(
+        request,
+        'home/assignment.html',
+        context
+    )
+
+@login_required
+@lecturer_required
+def delete_assignment(request, code, pk):
+    instance = get_object_or_404(Assignment, pk=pk)
+    instance.delete()
+    messages.success(request, 'Đã xóa thành công')
+    return redirect('course-page-lecturer', code=code)
+
+
+@login_required
+@lecturer_required
+def add_announcement(request, code):
+    course = Course.objects.get(code=code)
+    if request.method == 'POST':
+        form = AnnouncementForm(request.POST)
+        form.instance.course_code = course
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Đã thêm thông báo thành công!')
+            return redirect('course-page-lecturer', code=code)
+        else:
+            messages.error(request, 'Lỗi xảy ra!')
+            return redirect('add-announcement', code=code)
+    else:
+        form = AnnouncementForm()
+    context = {
+        "title": "Thêm thông báo",
+        "form": form,
+        "action": "Thêm",
+    }
+    return render(
+        request,
+        'home/announcement.html',
+        context
+    )
+
+@login_required
+@lecturer_required
+def edit_announcement(request, code, pk):
+    instance = get_object_or_404(Announcement, pk=pk)
+    if request.method == 'POST':
+        form = AnnouncementForm(request.POST, instance=instance)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Đã sửa thông báo thành công!')
+            return redirect('course-page-lecturer', code=code)
+        else:
+            messages.error(request, 'Lỗi!')
+            return redirect('edit-announcement', code=code, pk=pk)
+    else:
+        form = AnnouncementForm(instance=instance)
+    context = {
+        "title": "Chỉnh sửa thông báo",
+        "form": form,
+        "action": "Edit",
+    }
+    return render(
+        request,
+        'home/announcement.html',
+        context,
+    )
+
+@login_required
+@lecturer_required
+def delete_annoucement(request, code, pk):
+    instance = get_object_or_404(Announcement, pk=pk)
+    instance.delete()
+    messages.success(request, 'Đã xóa thông báo thành công!')
+    return redirect('course-page-lecturer', code=code)
+

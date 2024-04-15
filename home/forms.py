@@ -1,5 +1,5 @@
 from django import forms
-from .models import User, Student, GENDERS, Department, Course, Lecturer, Material, MaterialDetail
+from .models import User, Student, GENDERS, Department, Course, Lecturer, Material, MaterialDetail, Assignment, Announcement
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, PasswordChangeForm
 from froala_editor.widgets import FroalaEditor
 from django.forms import inlineformset_factory
@@ -374,3 +374,65 @@ class MaterialDetailAddForm(forms.ModelForm):
             "url",
             "file",
         ]
+
+
+class AssignmentAddForm(forms.ModelForm):
+    title = forms.CharField(
+        max_length=200,
+        widget=forms.TextInput(
+            attrs={
+                "type": "text",
+                "class": "form-control",
+                "placeholder": "Tiêu đề",
+            }
+        )
+    )
+
+    description = forms.CharField(
+        widget=FroalaEditor,
+        required=False,
+    )
+
+    deadline = forms.DateTimeField(
+        widget=forms.DateTimeInput(
+            attrs={
+                "class": "form-control",
+                "type": "datetime-local",
+            }
+        )
+    )
+    marks = forms.DecimalField(
+        widget=forms.NumberInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Điểm",
+            }
+        )
+    )
+
+    file = forms.FileField(
+        widget=forms.FileInput(
+            attrs={
+                "class": "form-control",
+            }
+        ),
+        required=False
+    )
+
+    class Meta:
+        model = Assignment
+        fields = ('title', 'file', 'description', 'deadline', 'marks')
+    
+
+class AnnouncementForm(forms.ModelForm):
+    description = forms.CharField(
+        widget=FroalaEditor,
+    )
+    class Meta:
+        model = Announcement
+        fields = ('description',)
+
+    
+
+
+

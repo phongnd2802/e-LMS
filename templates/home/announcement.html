@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} {{title}} - {% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+       <div class="col-md-8 shadow-lg p-3 rounded">
+          <div class="text-center">
+             <div class="fw-bold mb-3 text-start">Thêm thông báo</div>
+             <div class="from-group">
+                <form method="post" enctype="multipart/form-data">
+                   {% csrf_token %}
+                   {{ form.description }}
+                   <!-- submit button -->
+                   <div class="d-grid col-12 mx-auto">
+                    <button class="btn btn-primary my-2" type="submit">{{ action }}</button>
+                    </div>
+                </form>
+             </div>
+          </div>
+       </div>
+    </div>
+ </div>
+{% endblock %}

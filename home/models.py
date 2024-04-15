@@ -124,6 +124,7 @@ class Assignment(models.Model):
     title = models.CharField(max_length=255, null=False)
     description = models.TextField(max_length=2000, null=True)
     created_at = models.DateTimeField(auto_now_add=True, null=False)
+    updated_at = models.DateTimeField(auto_now=True)
     deadline = models.DateTimeField(null=False)
     file = models.FileField(upload_to='assignments/', null=True, blank=True)
     marks = models.DecimalField(max_digits=6, decimal_places=2, null=False)
@@ -136,7 +137,7 @@ class Assignment(models.Model):
 
     @property
     def post_date(self):
-        return self.created_at.strftime("%d-%m-%Y, %H:%M:%S")
+        return self.updated_at.strftime("%d-%m-%Y, %H:%M:%S")
     
     @property
     def due_date(self):
