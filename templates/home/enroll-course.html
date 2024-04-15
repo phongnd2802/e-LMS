@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% endblock %}
+
+{% block content %}
+{% include 'components/messages.html' %}
+<div class="container-fluid d-flex" style="min-height: 70vh;">
+    <div class="row justify-content-center m-3 align-self-center w-100">
+       <div class="col-lg-4 col-sm-12 col-md-6 border p-3 rounded">
+          <form action="" method="post">
+             {% csrf_token %}
+             <div class="mb-3">
+                <label for="key" class="form-label">Nhập mã vào khóa học:  </label>
+                <input type="text" class="form-control" name="key"  placeholder="Ex: 1234">
+             </div>
+             <button type="submit" class="btn btn-sm btn-primary">Xác nhận</button>
+          </form>
+       </div>
+    </div>
+ </div>
+{% endblock %}

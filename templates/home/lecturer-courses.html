@@ -23,12 +23,8 @@
                   <div class="img-box">
                     <img src="{{ course.picture.url }}" alt="courses img">
                   </div>
-                  <h3 class="title">{{ course.name }}</h3>
-                  <div class="rating">
-                    <span class="average-rating">({{ student_count|get_item:course.code }})</span>
-                    <span class="reviews">Sinh viên tham gia</span>
-                  </div>
-                  <!-- <div class="price">Upcoming</div> -->
+                  <h3 class="title">{{ course.name }} <br> ({{ course.code }})</h3>
+                  <div class="price"><i class="fas fa-user"></i>  {{ student_count|get_item:course.code}}</div>
                 </div>
               </a>
             </div>

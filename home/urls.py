@@ -33,4 +33,8 @@ urlpatterns = [
     path('course-page-lecturer/<str:code>/announcement/<int:pk>/edit/', views.edit_announcement, name='edit-announcement'),
     path('course-page-lecturer/<str:code>/announcement/<int:pk>/delete/', views.delete_annoucement, name='delete-announcement'),
 
+
+    path('course/<str:code>/detail/', views.course_detail, name='course-detail'),
+    path('course/<str:code>/detail/enroll/', views.enroll_course, name='enroll-course'),
+    path('course-page/<str:code>/', views.course_page, name='course-page'),
 ]

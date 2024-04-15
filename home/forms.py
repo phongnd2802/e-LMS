@@ -277,7 +277,7 @@ class ChangePasswordForm(PasswordChangeForm):
         ]
 
 class StudentAddForm(forms.ModelForm):
-    student = forms.ModelChoiceField(queryset=User.objects.filter(is_student=False, is_lecturer=False))
+    student = forms.ModelChoiceField(queryset=User.objects.filter(is_student=False, is_lecturer=False), required=False)
 
     class Meta:
         model = Student

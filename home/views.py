@@ -15,13 +15,26 @@ from django.template.defaulttags import register
 
 # Create your views here.
 def home(request):
-    students = User.objects.filter(is_student=True).count()
-    lecturers = User.objects.filter(is_lecturer=True).count()
-    courses = Course.objects.all().count()
+    students_count = User.objects.filter(is_student=True).count()
+    lecturers_count = User.objects.filter(is_lecturer=True).count()
+    courses_count = Course.objects.all().count()
+
+    courses = Course.objects.all()
+    student_count = courses.annotate(student_count=Count('student'))
+
+    student_each_course = {}
+    for course in student_count:
+        student_each_course[course.code] = course.student_count
+    
+    @register.filter
+    def get_item(dictionary, course_code):
+        return dictionary.get(course_code)
     context = {
-        "students": students,
-        "lecturers": lecturers,
+        "students_count": students_count,
+        "lecturers_count": lecturers_count,
+        "courses_count": courses_count,
         "courses": courses,
+        "student_count": student_each_course
     }
     return render(
         request,
@@ -181,8 +194,24 @@ def change_password(request):
 
 @login_required
 def student_courses(request):
+    student = Student.objects.get(student=request.user)
+    courses = student.course.all()
     
-    context = {}
+    student_count = courses.annotate(student_count=Count('student'))
+
+    student_each_course = {}
+    for course in student_count:
+        student_each_course[course.code] = course.student_count
+    
+    @register.filter
+    def get_item(dictionary, course_code):
+        return dictionary.get(course_code)
+    context = {
+        "title": "Khóa học của tôi",
+        "courses": courses,
+        "student": student,
+        "student_count": student_each_course
+    }
     return render(
         request,
         'home/student-courses.html',
@@ -497,3 +526,67 @@ def delete_annoucement(request, code, pk):
     messages.success(request, 'Đã xóa thông báo thành công!')
     return redirect('course-page-lecturer', code=code)
 
+
+def course_detail(request, code):
+    course = get_object_or_404(Course, code=code)
+    materials = Material.objects.filter(course_code=course).order_by('created_at')
+    materials_detail = MaterialDetail.objects.filter(material_id__in=materials.values_list('pk', flat=True)).order_by('created_at')
+    context = {
+        "title": course.name,
+        "course": course,
+        "materials": materials,
+        "materials_detail": materials_detail,
+    }
+    return render(
+        request,
+        'home/course-detail.html',
+        context 
+    )
+
+@login_required
+def enroll_course(request, code):
+    course = Course.objects.get(code=code)
+    student = Student.objects.get(student=request.user)
+    if request.method == 'POST':
+        key = request.POST.get('key')
+        if key == str(course.student_key):
+            student.course.add(course)
+            student.save()
+            return redirect('course-page', code=code)
+        else:
+            messages.error(request, 'Mã không đúng!')
+            return redirect('enroll-course', code=code)
+    return render(
+        request,
+        'home/enroll-course.html',
+    )
+
+@login_required
+def course_page(request, code):
+    course = Course.objects.get(code=code)
+    try:
+        announcements = Announcement.objects.filter(course_code=course)
+        assignments = Assignment.objects.filter(course_code=course).order_by('created_at')
+        materials = Material.objects.filter(course_code=course).order_by('created_at')
+        student_count = Student.objects.filter(course=course).count()
+        materials_detail = MaterialDetail.objects.filter(material_id__in=materials.values_list('pk', flat=True)).order_by('created_at')
+    except:
+        announcements = None
+        assignments = None
+        materials = None
+        materials_detail = None
+        student_count = 0
+    context =  {
+        "title": course.name,
+        "announcements": announcements,
+        "assignments": assignments,
+        "materials": materials,
+        "materials_detail": materials_detail,
+        "student_count": student_count,
+        "course": course,
+    }
+    return render(
+        request,
+        'home/course-page-lecturer.html',
+        context,
+    )

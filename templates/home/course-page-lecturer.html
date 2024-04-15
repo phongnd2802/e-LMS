@@ -52,15 +52,18 @@
           <h5 class="fw-bold" style="color: rgb(10, 10, 48);"><img src="{% static 'img/icon/megaphone.png' %}"
              alt="" style="height:1.5rem; vertical-align: text-bottom;"><span style="margin-right: 0.6rem;"></span>Thông báo
           </h5>
+          {% if user.is_lecturer %}
           <a
              href="{% url 'add-announcement' code=course.code %}"><img src="{% static 'img/icon/iconBlack.png' %}"
              alt="" height="32"></a>
+             {% endif %}
        </div>
        <div>
           {% for announcement in announcements %}
           <!-- individual announcement starts -->
           <div class="fs-6 text-wrap text-break" id="annDescription{{announcement.id}}">{% autoescape off %}{{announcement.description}}{% endautoescape %}</div>
           <div class="d-flex justify-content-between">
+            {% if user.is_lecturer %}
              <div>
                 <!-- Popup -->
                 <a class="btn btn-sm btn-outline-danger" style="border:none"
@@ -80,6 +83,7 @@
                    <span style="vertical-align:middle">Edit</span> 
                 </a>
              </div>
+             {% endif %}
              <div class="add-announcement" style="color:grey;">
                 {{announcement.post_date}}
              </div>
@@ -97,11 +101,13 @@
        <div class="animate__animated animate__zoomInLeft d-flex flex-row justify-content-between edit border-bottom border-1 mb-2">
           <h5 class="fw-bold assignmentCls" style="color: rgb(10, 10, 48);"><img src="{% static 'img/icon/open-book.png' %}"
              alt="" style="height:1.5rem; vertical-align: top"><span style="margin-right: 0.6rem;"></span>Bài tập</h5>
+            {% if user.is_lecturer %}
           <a style="height:2rem"
              href="{% url 'add-assignment' code=course.code %}">
           <img src="{% static 'img/icon/iconBlack.png' %}"
              alt="" height="32">
           </a>
+          {% endif %}
        </div>
        <div>
           {% for assignment in assignments %}
@@ -111,6 +117,7 @@
             <div class="text-muted" style="margin-right: auto;"">
             {{assignment.post_date}}
             </div>
+            {% if user.is_lecturer %}
           <div class="d-flex justify-content-between">
              <div class="text-muted">
                 <p>Đã nộp : {{ assignment.submission_set.count}} / {{ student_count }} </p>
@@ -134,6 +141,7 @@
                </a>
             </div>
           </div>
+          {% endif %}
           <hr>
           <!-- individual assignment ends -->
           {% empty %}
@@ -155,17 +163,20 @@
        <div class="d-flex flex-row justify-content-between edit border-bottom border-1 mb-2 animate__animated animate__zoomInUp">
           <h5 class="fw-bold" style="color: rgb(10, 10, 48);"><img src="{% static 'img/icon/folder.png' %}"
              alt="" style="height:1.5rem; vertical-align: top"><span style="margin-right: 0.6rem;"></span>Tài liệu &amp; Video</h5>
+             {% if user.is_lecturer %}
           <a
              href="{% url 'add-course-material' code=course.code %}"><img src="{% static 'img/icon/iconBlack.png' %}"
              alt="" height="32"></a>
+             {% endif %}
        </div>
          {% for material in materials  %}
          <div>
           <!-- individual material starts -->
-          <div class="dropdown">
-            <h3 class="fw-bold">{{material.title}}</h3>
-            <img class="dropdown-toggle" id="drop" data-bs-toggle="dropdown" aria-expanded="false" src="{% static 'img/icon/dropDown.png' %}"
-               alt="Options" height="32">
+          <div class="dropdown" style=" position: relative;">
+            <h3 class="fw-bold" style="display: inline-block; ">{{material.title}}</h3>
+            {% if user.is_lecturer %}
+            <img class="dropdown" id="drop" data-bs-toggle="dropdown" aria-expanded="false" src="{% static 'img/icon/dropDown.png' %}"
+               alt="Options" height="32" style="position: absolute; top: 0; right: 0;">
             <ul class="dropdown-menu">
                <li class="border-bottom">
                   <a class="dropdown-item" href="{% url 'add-course-material-detail' code=course.code material_id=material.pk %}">
@@ -191,8 +202,8 @@
                   </a>
                </li>
             </ul>
+            {% endif %}
          </div>
-            <br>
             {% for material_detail in materials_detail %}
                {% if material_detail.material_id == material.pk %}
             <a class="fw-bold" href="{{ material_detail.file.url }}"><span style="color:#9400d3" id="materialName">
@@ -200,6 +211,7 @@
             </span></a>
             <p>{% autoescape off %}{{material_detail.description}}{% endautoescape %}</p>
                    <!-- Popup -->
+                   {% if user.is_lecturer %}
             <div>
                <a class="btn btn-sm btn-outline-danger" style="border:none"
                   href="{% url 'delete-course-material-detail' code=course.code material_id=material.pk detail_id=material_detail.pk %}">
@@ -218,6 +230,7 @@
                   <span style="vertical-align:middle">Edit</span> 
                </a>
             </div>
+            {% endif %}
             <hr>
             {% endif %}
           {% endfor %}

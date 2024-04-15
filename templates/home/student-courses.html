@@ -18,13 +18,17 @@
         <!-- courses-item start -->
         <div class="col-md-6 col-lg-3">
             <div class="courses-item">
-              <a href="#" class="link">
+              <a href="{% url 'course-page' code=course.code %}" class="link">
                 <div class="courses-item-inner">
                   <div class="img-box">
-                    <img src="#" alt="courses img">
+                    <img src="{{ course.picture.url }}" alt="courses img">
                   </div>
-                  <h3 class="title">{{ course.name }}</h3>
-                  <!-- <div class="price">Upcoming</div> -->
+                  <h3 class="title">{{course.name}} <br> ({{course.code}})</h3>
+                  <div class="instructor">
+                    <img src="{{ course.lecturer.lecturer.picture.url }}">
+                    <span class="instructor-name">{{ course.lecturer }}</span>
+                  </div>
+                  <div class="price"><i class="fas fa-user"></i>  {{ student_count|get_item:course.code}}</div>
                 </div>
               </a>
             </div>

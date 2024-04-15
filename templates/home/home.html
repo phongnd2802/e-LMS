@@ -47,13 +47,13 @@
             <div class="row text-center">
               <div class="col-md-6 col-lg-3">
                 <div class="fun-facts-item">
-                  <h2 class="style-1">{{ students }}</h2>
+                  <h2 class="style-1">{{ students_count }}</h2>
                   <p>Người học</p>
                 </div>
               </div>
               <div class="col-md-6 col-lg-3">
                 <div class="fun-facts-item">
-                  <h2 class="style-2">{{ courses }}</h2>
+                  <h2 class="style-2">{{ courses_count }}</h2>
                   <p>Khóa học</p>
                 </div>
               </div>
@@ -65,7 +65,7 @@
               </div> -->
               <div class="col-md-6 col-lg-3">
                 <div class="fun-facts-item">
-                  <h2 class="style-4">{{ lecturers }}</h2>
+                  <h2 class="style-4">{{ lecturers_count }}</h2>
                   <p>Giảng viên</p>
                 </div>
               </div>
@@ -88,126 +88,26 @@
           </div>
 
           <div class="row">
-                      <!-- courses-item start -->
-        <div class="col-md-6 col-lg-3">
-          <div class="courses-item">
-            <a href="#" class="link">
-              <div class="courses-item-inner">
-                <div class="img-box">
-                  <img src="{% static 'img/courses/web-development/1.jpg' %}" alt="courses img">
-                </div>
-                <h3 class="title">Web Design for beginners</h3>
-                <div class="instructor">
-                  <img src="{% static 'img/instructor/1.png' %}" alt="instructor img">
-                  <span class="instructor-name">Dip Dutta</span>
-                </div>
-                <div class="rating">
-                  <span class="average-rating">(4.5)</span>
-                  <span class="avarage-stars">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star-half-alt"></i>
-                  </span>
-                  <span class="reviews">(20)</span>
-                </div>
-                <div class="price">Upcoming</div>
-              </div>
-            </a>
-          </div>
-        </div>
-        <!-- courses-item end -->
-                     <!-- courses-item start -->
-                     <div class="col-md-6 col-lg-3">
-                      <div class="courses-item">
-                        <a href="#" class="link">
-                          <div class="courses-item-inner">
-                            <div class="img-box">
-                              <img src="{% static 'img/courses/web-development/2.jpg' %}" alt="courses img">
-                            </div>
-                            <h3 class="title">Learn English with British Council teachers</h3>
-                            <div class="instructor">
-                              <img src="{% static 'img/instructor/1.png' %}" alt="instructor img">
-                              <span class="instructor-name">Shuvo Das</span>
-                            </div>
-                            <div class="rating">
-                              <span class="average-rating">(4.5)</span>
-                              <span class="avarage-stars">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star-half-alt"></i>
-                              </span>
-                              <span class="reviews">(110)</span>
-                            </div>
-                            <div class="price">$ 90</div>
-                          </div>
-                        </a>
+            {% for course in courses %}
+            <!-- courses-item start -->
+            <div class="col-md-6 col-lg-3">
+                <div class="courses-item">
+                  <a href="{% url 'course-detail' code=course.code %}" class="link">
+                    <div class="courses-item-inner">
+                      <div class="img-box">
+                        <img src="{{ course.picture.url }}" alt="courses img">
                       </div>
+                      <h3 class="title">{{course.name}} <br> ({{course.code}})</h3>
+                      <div class="instructor">
+                        <img src="{{ course.lecturer.lecturer.picture.url }}">
+                        <span class="instructor-name">{{ course.lecturer }}</span>
+                      </div>
+                      <div class="price"><i class="fas fa-user"></i>  {{ student_count|get_item:course.code}}</div>
                     </div>
-                    <!-- courses-item end -->
-            <!-- courses-item start -->
-            <div class="col-md-6 col-lg-3">
-              <div class="courses-item">
-                <a href="#" class="link">
-                  <div class="courses-item-inner">
-                    <div class="img-box">
-                      <img src="{% static 'img/courses/web-development/3.jpg' %}" alt="courses img">
-                    </div>
-                    <h3 class="title">Microsoft Office For Beginners</h3>
-                    <div class="instructor">
-                      <img src="{% static 'img/instructor/1.png' %}" alt="instructor img">
-                      <span class="instructor-name">Nitu</span>
-                    </div>
-                    <div class="rating">
-                      <span class="average-rating">(4.5)</span>
-                      <span class="avarage-stars">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
-                      </span>
-                      <span class="reviews">(50)</span>
-                    </div>
-                    <div class="price">$ 90</div>
-                  </div>
-                </a>
+                  </a>
+                </div>
               </div>
-            </div>
-            <!-- courses-item end -->
-            <!-- courses-item start -->
-            <div class="col-md-6 col-lg-3">
-              <div class="courses-item">
-                <a href="#" class="link">
-                  <div class="courses-item-inner">
-                    <div class="img-box">
-                      <img src="{% static 'img/courses/web-development/4.jpg' %}" alt="courses img">
-                    </div>
-                    <h3 class="title">Graphic Design For Beginners</h3>
-                    <div class="instructor">
-                      <img src="{% static 'img/instructor/1.png' %}" alt="instructor img">
-                      <span class="instructor-name">Akhi</span>
-                    </div>
-                    <div class="rating">
-                      <span class="average-rating">(4.5)</span>
-                      <span class="avarage-stars">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
-                      </span>
-                      <span class="reviews">(230)</span>
-                    </div>
-                    <div class="price">$ 100</div>
-                  </div>
-                </a>
-              </div>
-            </div>
-            <!-- courses-item end -->
+              {% endfor %}
           </div>
           <div class="row">
             <div class="col-12 text-center mt-3">
