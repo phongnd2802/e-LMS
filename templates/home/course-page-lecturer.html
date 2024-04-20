@@ -206,9 +206,14 @@
          </div>
             {% for material_detail in materials_detail %}
                {% if material_detail.material_id == material.pk %}
+               {% if material_detail.file %}
             <a class="fw-bold" href="{{ material_detail.file.url }}"><span style="color:#9400d3" id="materialName">
+               
                {{material_detail.name}}
             </span></a>
+            {% else %}
+            <span>{{material_detail.name}}</span>
+            {% endif %}
             <p>{% autoescape off %}{{material_detail.description}}{% endautoescape %}</p>
                    <!-- Popup -->
                    {% if user.is_lecturer %}

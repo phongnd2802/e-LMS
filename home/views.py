@@ -12,6 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import update_session_auth_hash
 from .decorators import lecturer_required
 from django.template.defaulttags import register
+from django.core.exceptions import ObjectDoesNotExist
 
 # Create your views here.
 def home(request):
@@ -425,7 +426,7 @@ def add_assignment(request, code):
     }
     return render(
         request,
-        'home/assignment.html',
+        'home/add-assignment.html',
         context,
     )
 
@@ -452,7 +453,7 @@ def edit_assignment(request, code, pk):
     }
     return render(
         request,
-        'home/assignment.html',
+        'home/edit-assignment.html',
         context
     )
 
@@ -529,15 +530,19 @@ def delete_annoucement(request, code, pk):
 
 def course_detail(request, code):
     if request.user.is_authenticated:
-        student = Student.objects.get(student=request.user)
-        courses = student.course.all()
-        course = get_object_or_404(Course, code=code)
-        if course in courses:
-            return redirect('course-page', code=code)
-    else:
-        course = get_object_or_404(Course, code=code)
-        materials = Material.objects.filter(course_code=course).order_by('created_at')
-        materials_detail = MaterialDetail.objects.filter(material_id__in=materials.values_list('pk', flat=True)).order_by('created_at')
+        try:
+            student = Student.objects.get(student=request.user)
+            courses = student.course.all()
+            course = get_object_or_404(Course, code=code)
+            if course in courses:
+                return redirect('course-page', code=code) 
+        except ObjectDoesNotExist:
+            course = get_object_or_404(Course, code=code)
+            if course.lecturer.lecturer == request.user:
+                return redirect('course-page', code=code)
+    course = get_object_or_404(Course, code=code)
+    materials = Material.objects.filter(course_code=course).order_by('created_at')
+    materials_detail = MaterialDetail.objects.filter(material_id__in=materials.values_list('pk', flat=True)).order_by('created_at')
     context = {
         "title": course.name,
         "course": course,
@@ -597,3 +602,4 @@ def course_page(request, code):
         'home/course-page-lecturer.html',
         context,
     )
+
