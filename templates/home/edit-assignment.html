@@ -12,7 +12,7 @@
                    {% csrf_token %}
                    {% for field in form %}
                    <div class="mb-3">
-                     {% if field.name == 'file' %}
+                     {% if field.name == file %}
                      <a href="{{ form.instance.file.url }}" style="display: flex;">{{ form.instance.file.name }}</a>
                      {{ field }}
                      {% else %}

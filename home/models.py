@@ -114,7 +114,7 @@ class Announcement(models.Model):
     
     @property
     def post_date(self):
-        return self.created_at.strftime("%d-%m-%Y, %H:%M:%S")
+        return self.created_at.strftime("%d-%m-%Y, %I:%M:%S %p")
 
 
 class Assignment(models.Model):
@@ -137,11 +137,11 @@ class Assignment(models.Model):
 
     @property
     def post_date(self):
-        return self.updated_at.strftime("%d-%m-%Y, %H:%M:%S")
+        return self.updated_at.strftime("%d-%m-%Y, %I:%M:%S %p")
     
     @property
     def due_date(self):
-        return self.deadline.strftime("%d-%m-%Y, %H:%M:%S")
+        return self.deadline.strftime("%d-%m-%Y, %I:%M:%S %p")
     
     def delete(self, *args, **kwargs):
         self.file.delete()
@@ -159,7 +159,7 @@ class Submission(models.Model):
     status = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
-        return self.student.get_full_name + " - " + self.assignment.title
+        return self.student.student.get_full_name + " - " + self.assignment.title
 
     @property
     def file_name(self):
@@ -186,7 +186,7 @@ class Submission(models.Model):
         
     @property
     def submission_date(self):
-        return self.submited_date.strftime("%d-%m-%Y, %H:%M:%S")
+        return self.submited_date.strftime("%d-%m-%Y, %I:%M:%S %p")
 
     def delete(self, *args, **kwargs):
         self.file.delete()
@@ -216,7 +216,7 @@ class Material(models.Model):
 
     @property
     def post_date(self):
-        return self.created_at.strftime("%d-%m-%Y, %H:%M:%S")
+        return self.created_at.strftime("%d-%m-%Y, %I:%M:%S %p")
 
 
 class MaterialDetail(models.Model):
@@ -240,5 +240,5 @@ class MaterialDetail(models.Model):
 
     @property
     def post_date(self):
-        return self.updated_at.strftime("%d-%m-%Y, %H:%M:%S")
+        return self.updated_at.strftime("%d-%m-%Y, %I:%M:%S %p")
 

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import auth, messages
-from .models import User, Course, Lecturer, Assignment, Material, Announcement, Student, MaterialDetail
+from .models import User, Course, Lecturer, Assignment, Material, Announcement, Student, MaterialDetail, Department, Submission
 from .forms import (
     RegisterForm, LoginForm,
     ProfileUpdateForm, ChangePasswordForm,
@@ -13,6 +13,8 @@ from django.contrib.auth import update_session_auth_hash
 from .decorators import lecturer_required
 from django.template.defaulttags import register
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils import timezone
+from datetime import datetime
 
 # Create your views here.
 def home(request):
@@ -146,7 +148,9 @@ def logout_view(request):
 def profile_update(request):
     if request.method == 'POST':
         form = ProfileUpdateForm(request.POST, instance=request.user)
+        user = User.objects.get(pk=int(request.user.id))
         if form.is_valid():
+            form.instance.department = Department.objects.get(pk=user.department.id)
             form.save()
             messages.success(request, 'Hồ sơ của bạn đã được cập nhật thành công!')
             return redirect('profile-update')
@@ -195,14 +199,17 @@ def change_password(request):
 
 @login_required
 def student_courses(request):
-    student = Student.objects.get(student=request.user)
+    user = get_object_or_404(User, is_student=True, pk=request.user.id)
+    student = Student.objects.get(student=user)
     courses = student.course.all()
     
-    student_count = courses.annotate(student_count=Count('student'))
+    all_courses = Course.objects.all()
+    student_count = all_courses.annotate(student_count=Count('student'))
 
     student_each_course = {}
     for course in student_count:
-        student_each_course[course.code] = course.student_count
+        if course in courses:
+            student_each_course[course.code] = course.student_count
     
     @register.filter
     def get_item(dictionary, course_code):
@@ -603,3 +610,93 @@ def course_page(request, code):
         context,
     )
 
+@login_required
+def add_submission(request, code, pk):
+    course = Course.objects.get(code=code)
+    assignment = Assignment.objects.get(pk=pk)
+    not_submit = False
+    if assignment.due_date < datetime.now().strftime("%d-%m-%Y, %I:%M:%S %p"):
+        not_submit = True
+
+    if request.method == 'POST' and request.FILES:
+        assignment = Assignment.objects.get(pk=pk)
+        submission = Submission(assignment=assignment, student=Student.objects.get(student=request.user),
+                                file=request.FILES['file'])
+        submission.status = "Đã nộp!"
+        submission.save()
+        return redirect('add-submission', code=code, pk=pk)
+    else:
+        assignment = Assignment.objects.get(pk=pk)
+        student = Student.objects.get(student=request.user)
+        try:
+            submission = Submission.objects.get(assignment=assignment, student=student)
+            return redirect('edit-submission', code=code, pk=pk)
+        except ObjectDoesNotExist:
+            submission = None
+    context = {
+        'assignment': assignment,
+        'course': course,
+        'submission': submission,
+        'student': Student.objects.get(student=request.user),
+        'courses': Student.objects.get(student=request.user).course.all(),
+        "not_submit": not_submit,
+        "action": "Nộp bài",
+    }
+    return render(request, 'home/assignment-portal.html', context)
+
+@login_required
+def edit_submission(request, code, pk):
+    course = Course.objects.get(code=code)
+    assignment = Assignment.objects.get(pk=pk)
+    submission = Submission.objects.get(assignment=assignment, student=Student.objects.get(student=request.user))
+    if assignment.due_date < datetime.now().strftime("%d-%m-%Y, %I:%M:%S %p"):
+        pass
+
+    if request.method == 'POST' and request.FILES:
+        submission.file = request.FILES['file']
+        submission.status = "Đã nộp lại!"
+        submission.save()
+        return redirect('edit-submission', code=code, pk=pk)
+    else:
+        assignment = Assignment.objects.get(pk=pk)
+        submission = Submission.objects.get(assignment=assignment, student=Student.objects.get(student=request.user))
+    context = {
+        "course": course,
+        "assignment": assignment,
+        "submission": submission,
+        "action": "Chỉnh sửa bài nộp",
+    }
+    return render(request, 'home/assignment-portal.html', context)
+
+@login_required
+@lecturer_required
+def view_all_submission(request, code, pk):
+    course = Course.objects.get(code=code)
+    assignment = Assignment.objects.get(pk=pk)
+    submissions = Submission.objects.filter(assignment=assignment)
+    total_students = Student.objects.filter(course=course).count()
+    context = {
+        "submissions": submissions,
+        "course": course,
+        "assignment": assignment,
+        "total_students": total_students,
+    }
+    return render(
+        request,
+        'home/view-submissions.html',
+        context
+    )
+
+@login_required
+@lecturer_required
+def grade_submission(request, code, assign_id, pk):
+    if request.method == 'POST':
+        course = Course.objects.get(code=code)
+        assignment = Assignment.objects.get(pk=assign_id)
+        submission = Submission.objects.get(pk=pk)
+        marks = float(request.POST.get('marks'))
+        submission.marks = marks
+        submission.save()
+        return redirect('view-submissions', code=code, pk=assign_id)
+    else:
+        return redirect('view-submissions', code=code, pk=assign_id)
