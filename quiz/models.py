@@ -24,25 +24,29 @@ class Quiz(models.Model):
     def __str__(self):
         return self.title
     
-    @property
     def duration(self):
         return self.end - self.start
-    
-    @property
+        
     def duration_in_seconds(self):
         return (self.end - self.start).total_seconds()
-    
-    @property
-    def start_time(self):
+
+    def total_questions(self):
+        return Question.objects.filter(quiz=self).count()
+
+    def question_sl(self):
+        return Question.objects.filter(quiz=self).count() + 1
+
+    def total_marks(self):
+        return Question.objects.filter(quiz=self).aggregate(total_marks=models.Sum('marks'))['total_marks']
+
+    def starts(self):
         return self.start.strftime("%a, %d-%b-%y at %I:%M %p")
-    
-    @property
-    def end_time(self):
+
+    def ends(self):
         return self.end.strftime("%a, %d-%b-%y at %I:%M %p")
 
-
     def attempted_students(self):
-        return Student.objects.filter(studentanwer__quiz=self).distinct().count()
+        return Student.objects.filter(studentanswer__quiz=self).distinct().count()
     
 class Question(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
@@ -53,7 +57,7 @@ class Question(models.Model):
     option3 = models.TextField(max_length=1000)
     option4 = models.TextField(max_length=1000)
     image = models.ImageField(upload_to='question/', null=True)
-    anwser = models.CharField(max_length=1, choices=ANSWER, null=False, blank=False)
+    answer = models.CharField(max_length=1, choices=ANSWER, null=False, blank=False)
 
     explanation_text = models.TextField(null=True, blank=True)
     explanation_image = models.ImageField(upload_to='explanation/', null=True, blank=True)
@@ -64,7 +68,7 @@ class Question(models.Model):
     @property
     def get_answer(self):
         case = {
-            'A' : self.option1,
+            'A': self.option1,
             'B': self.option2,
             'C': self.option3,
             'D': self.option4,

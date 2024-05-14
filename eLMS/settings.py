@@ -84,9 +84,9 @@ WSGI_APPLICATION = 'eLMS.wsgi.application'
 DATABASES = {
     'default': {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": "e-lms",
+        "NAME": "elms",
         "USER": "postgres",
-        "PASSWORD": "123456",
+        "PASSWORD": "12345",
         "HOST": "localhost",
         "PORT": 5432,
     }
@@ -117,11 +117,11 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Ho_Chi_Minh'
 
 USE_I18N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)

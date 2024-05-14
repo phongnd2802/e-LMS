@@ -9,7 +9,19 @@
 <div class="container d-flex flex-wrap flex-column">
     <!-- course name starts -->
     <div class="rounded p-3 m-3 shadow d-flex justify-content-between align-items-center">
-       <span></span>
+      {% if user.is_lecturer %}
+      <div class="form-check form-switch">
+      <form id="publish-course-form" action="{% url 'publish-course' code=course.code %}" method="POST">
+         {% csrf_token %}
+         <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" 
+                {% if course.is_publish %}checked{% endif %} 
+                data-course-code="{{ course.code }}">
+         <label class="form-check-label" for="flexSwitchCheckChecked">Công bố</label>
+     </form>
+    </div>
+    {% else %}
+    <span></span>
+    {% endif %}
        <h5 id="courseTitle" class="mt-2 fw-bold">Khóa học {{course.code}}: {{course.name}}</h5>
        <div class="dropdown">
           <img class="dropdown-toggle" id="drop" data-bs-toggle="dropdown" aria-expanded="false" src="{% static 'img/icon/dropDown.png' %}"
@@ -34,6 +46,7 @@
                 </a>
              </li>
              <li>
+               {% if user.is_lecturer %}
                 <a class="dropdown-item" href="{% url 'lecturer-quiz' code=course.code %}">
                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-card-text mx-2" viewBox="0 0 16 16">
                       <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"/>
@@ -41,6 +54,15 @@
                    </svg>
                    Quiz
                 </a>
+               {% else %}
+               <a class="dropdown-item" href="{% url 'student-quiz' code=course.code %}">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-card-text mx-2" viewBox="0 0 16 16">
+                     <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"/>
+                     <path d="M3 5.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3 8a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 8zm0 2.5a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5z"/>
+                  </svg>
+                  Quiz
+               </a>
+                {% endif %}
              </li>
           </ul>
        </div>
@@ -216,6 +238,10 @@
                
                {{material_detail.name}}
             </span></a>
+            {% elif material_detail.url %}
+            <a class="fw-bold" href="{{ material_detail.url }}"><span style="color:#9400d3" id="materialName">
+               
+               {{material_detail.name}}
             {% else %}
             <span>{{material_detail.name}}</span>
             {% endif %}
@@ -260,4 +286,38 @@
        var materialName = materialName.replace("materials/", "");
        document.getElementById("materialName").innerHTML = materialName;  
  </script>
+ {% block js %}
+ <script>
+ document.addEventListener('DOMContentLoaded', function() {
+    const checkbox = document.getElementById('flexSwitchCheckChecked');
+    const form = document.getElementById('publish-course-form');
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    checkbox.addEventListener('change', function() {
+        const isChecked = checkbox.checked;
+
+        // Create a new FormData object from the form
+        const formData = new FormData();
+        formData.append('is_checked', isChecked);
+        formData.append('csrfmiddlewaretoken', csrfToken);
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Course publish status updated successfully.');
+            } else {
+                console.error('Failed to update course publish status.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+});
+ </script>
+ {% endblock %}
 {% endblock %}

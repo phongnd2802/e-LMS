@@ -14,6 +14,7 @@ from .decorators import lecturer_required
 from django.template.defaulttags import register
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
+from django.http import JsonResponse
 from datetime import datetime
 
 # Create your views here.
@@ -22,7 +23,7 @@ def home(request):
     lecturers_count = User.objects.filter(is_lecturer=True).count()
     courses_count = Course.objects.all().count()
 
-    courses = Course.objects.all()
+    courses = Course.objects.filter(is_publish=True)
     student_count = courses.annotate(student_count=Count('student'))
 
     student_each_course = {}
@@ -91,7 +92,7 @@ def register_user(request):
                 request,
                 'Đăng kí thành công!'
             )
-            return redirect('sign-up')
+            return redirect('login')
         else:
             messages.error(
                 request,
@@ -119,7 +120,7 @@ def sign_up_lecturer(request):
                 request,
                 'Đã đăng kí thông tin, hãy chờ quản trị viên xem xét đăng kí của bạn!'
             )
-            return redirect('sign-up-lecturer')
+            return redirect('login')
         else:
             messages.error(
                 request,
@@ -150,7 +151,10 @@ def profile_update(request):
         form = ProfileUpdateForm(request.POST, instance=request.user)
         user = User.objects.get(pk=int(request.user.id))
         if form.is_valid():
-            form.instance.department = Department.objects.get(pk=user.department.id)
+            try:
+                form.instance.department = Department.objects.get(pk=user.department.id)
+            except AttributeError as e:
+                pass
             form.save()
             messages.success(request, 'Hồ sơ của bạn đã được cập nhật thành công!')
             return redirect('profile-update')
@@ -225,7 +229,6 @@ def student_courses(request):
         'home/student-courses.html',
         context,
     )
-
 
 @login_required
 @lecturer_required
@@ -320,7 +323,11 @@ def add_course_material(request, code):
 def edit_course_material(request, code, pk):
     instance = get_object_or_404(Material, pk=pk)
     if request.method == 'POST':
-        pass
+        form = MaterialAddForm(request.POST, instance=instance)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Success!')
+            return redirect('course-page-lecturer', code=code)
     else:
         form = MaterialAddForm(instance=instance)
     context = {
@@ -535,6 +542,21 @@ def delete_annoucement(request, code, pk):
     return redirect('course-page-lecturer', code=code)
 
 
+@login_required
+@lecturer_required
+def publish_course(request, code):
+    if request.method == 'POST':
+        course = get_object_or_404(Course, code=code)
+        is_checked = request.POST.get('is_checked')
+        if is_checked == "true":
+            course.is_publish = True
+        else:
+            course.is_publish = False
+        course.save()
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False})
+
+
 def course_detail(request, code):
     if request.user.is_authenticated:
         try:
@@ -583,6 +605,8 @@ def enroll_course(request, code):
 @login_required
 def course_page(request, code):
     course = Course.objects.get(code=code)
+    if not course.is_publish:
+        return redirect('home')
     try:
         announcements = Announcement.objects.filter(course_code=course)
         assignments = Assignment.objects.filter(course_code=course).order_by('created_at')

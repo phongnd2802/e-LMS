@@ -4,7 +4,7 @@ from django.shortcuts import redirect
 def admin_required(function=None, redirect_to="/",):
 
     def test_func(user):
-        return user.is_actice and user.is_superuser
+        return user.is_active and user.is_superuser
     
     def wrapper(request, *args, **kwargs):
         if test_func(request.user):

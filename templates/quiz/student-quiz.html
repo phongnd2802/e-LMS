@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block title %}Quizzes | {{ course.name }} {% endblock title %}
+
+{% block content %}
+<div class="container" id="con">
+   <div class="container">
+      <h6 class="fw-bold"> Sắp diễn ra </h6>
+      <div class="table-responsive animate__animated animate__fadeIn">
+         <table class="table text-center shadow" style="white-space: nowrap;">
+            {% if active_quizzes %}
+            <thead class="bg-dark text-light">
+               <tr>
+                  <th scope="col">SL</th>
+                  <th scope="col">Tên</th>
+                  <th scope="col">Bắt đầu</th>
+                  <th scope="col">Kết thúc</th>
+                  <th scope="col">Số lượng câu hỏi</th>
+                  <th scope="col">Tổng điểm</th>
+               </tr>
+            </thead>
+            <tbody class="">
+               {% for quiz in active_quizzes %}
+               <tr>
+                  <th scope="row">{{forloop.counter}}</th>
+                  <td><a href="{% url 'start-quiz' code=course.code quiz_id=quiz.pk %}">{{quiz.title}}</a></td>
+                  <td>{{quiz.start}}</td>
+                  <td>{{quiz.end}}</td>
+                  {% if quiz.total_questions > 0 %}
+                  <td>{{quiz.total_questions}}</td>
+                  <td>{{quiz.total_marks}}</td>
+                  {% else %}
+                  <td class="text-center">Questions not set yet</td>
+                  <td class="text-center">0</td>
+                  {% endif %}
+               </tr>
+               {% endfor %}
+               {% else %}
+               <tr>
+                  <th class="text-center">No active quizzes available</th>
+               </tr>
+               {% endif %}
+            </tbody>
+         </table>
+      </div>
+      <h6 class="fw-bold"> Lịch sử </h6>
+      <div class="table-responsive animate__animated animate__fadeIn">
+         <table class="table text-center shadow" style="white-space: nowrap;">
+            {% if previous_quizzes %}
+            <thead class="bg-dark text-light">
+               <tr>
+                  <th scope="col">SL</th>
+                  <th scope="col">Tên</th>
+                  <th scope="col">Kết thúc</th>
+                  <th scope="col">Điểm</th>
+                  <th scope="col">Tỷ lệ</th>
+               </tr>
+            </thead>
+            <tbody class="">
+               {% for quizP in previous_quizzes %}
+               {% if quizP.attempted %}
+               {% if quizP.publish_status %}
+               <tr>
+                  <th scope="row">{{forloop.counter}}</th>
+                  <td class="fw-bold">
+                     <a href="">{{quizP.title}}</a>
+                  </td>
+                  <td>{{quizP.ends}}</td>
+                  <td class="fw-bold marks">{{quizP.total_marks_obtained}}/ {{ quizP.total_marks}}</td>
+                  <td class="fw-bold percentage"> {{ quizP.percentage}}%</td>
+               </tr>
+               {% else %}
+               <tr>
+                  <th scope="row">{{forloop.counter}}</th>
+                  <td>
+                     {{quizP.title}}
+                  </td>
+                  <td>{{quizP.ends}}</td>
+                  <td colspan="2" class="text-center"> <span class="text-dark bg-warning bg-opacity-25 fw-bold rounded px-3 py-1" style="font-size:smaller">Not Published</span></td>
+               </tr>
+               {% endif %}
+               {% else %}
+               <tr>
+                  <th scope="row">{{forloop.counter}}</th>
+                  <td>
+                     {{quizP.title}}
+                  </td>
+                  <td>{{quizP.end}}</td>
+                  <td colspan="2" class="text-center"> <span class="text-light bg-danger fw-bold rounded px-2 py-1" style="font-size:smaller">Did not attempt</span></td>
+               </tr>
+               {% endif %}
+               {% endfor %}
+               {% else %}
+               <tr>
+                  <th scope="col" class="text-center">No previous quiz attempts</th>
+               </tr>
+               {% endif %}
+            </tbody>
+         </table>
+      </div>
+   </div>
+</div>
+<script>
+   $(document).ready(function () {
+      $('.table tbody tr').hover(function () {
+         $(this).addClass('bg-warning bg-opacity-10');
+      }, function () {
+         $(this).removeClass('bg-warning bg-opacity-10');
+   
+      });
+   });
+</script>
+{% endblock %}

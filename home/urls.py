@@ -14,6 +14,8 @@ urlpatterns = [
     path('lecturer-courses/', views.lecturer_courses, name='lecturer-courses'),
     path('student-courses/', views.student_courses, name='student-courses'),
 
+    path('course-page-lecturer/<str:code>/publish/', views.publish_course, name='publish-course'),
+
     #CRUD course content
     path('course-page-lecturer/<str:code>/', views.course_page_lecturer, name='course-page-lecturer'),
     path('course-page-lecturer/<str:code>/add-material/', views.add_course_material, name='add-course-material'),

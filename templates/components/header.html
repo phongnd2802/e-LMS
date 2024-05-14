@@ -18,10 +18,12 @@
                     {% if user.is_lecturer %}
                     <li class="menu-item"><a href="{% url 'lecturer-courses' %}">Khóa học</a></li>
 
+                    {% elif user.is_superuser %}
+                    <li class="menu-item"><a href="{% url 'index' %}">Quản lý các khóa học</a></li>
                     {% elif user.is_student %}
                     <li class="menu-item"><a href="{% url 'student-courses' %}">Khóa học</a></li>
                     {% else %}
-                    <li class="menu-item"><a href="{% url 'index' %}">Quản lý các khóa học</a></li>
+                    <li class="menu-item"><a href="{% url 'student-courses' %}">Khóa học</a></li>
                     {% endif %}
                 {% else %}
                     <li class="menu-item"><a href="{% url 'login' %}">Khóa học</a></li>

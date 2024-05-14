@@ -79,7 +79,7 @@ class Course(models.Model):
     )
     student_key = models.CharField(max_length=100, null=True, blank=True)
     lecturer_key = models.CharField(max_length=100, null=True, blank=True)
-
+    is_publish = models.BooleanField(default=False)
     class Meta:
         unique_together = ('code', 'name', 'department')
     
@@ -241,4 +241,5 @@ class MaterialDetail(models.Model):
     @property
     def post_date(self):
         return self.updated_at.strftime("%d-%m-%Y, %I:%M:%S %p")
+
 

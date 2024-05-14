@@ -38,7 +38,7 @@
                 <td>{{ quiz.total_questions}}</td>
                 <td>
                    {% if quiz.started == 0 %}
-                   <a class="btn btn-sm btn-primary" href="">Add question</a>
+                   <a class="btn btn-sm btn-primary" href="{% url 'add-question' code=course.code pk=quiz.pk %}">Add question</a>
                    {% else %}
                    <button disabled class="btn btn-sm btn-primary">Add question</button>
                    {% endif %}
