@@ -31,10 +31,10 @@
              <tr>
                 <th scope="row">{{ forloop.counter }}</th>
                 <td>
-                   <a class="fw-bold" {% if quiz.started %} style="color:#004481" {% endif %} href="">{{ quiz.title}}</a>
+                   <a class="fw-bold" {% if quiz.started %} style="color:#004481" {% endif %} href="{% url 'quiz-summary' course.code quiz.pk %}">{{ quiz.title}}</a>
                 </td>
-                <td>{{ quiz.start_time}} </td>
-                <td>{{ quiz.end_time}}</td>
+                <td>{{ quiz.starts}} </td>
+                <td>{{ quiz.ends}}</td>
                 <td>{{ quiz.total_questions}}</td>
                 <td>
                    {% if quiz.started == 0 %}

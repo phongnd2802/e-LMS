@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+   <div class="shadow-sm px-3 pt-3 rounded border  animate__animated animate__fadeInDown"">
+      <div class="row">
+         <div class="col-md-6">
+            <p class=" fw-bold fs-5"> {{quiz.title}} Result</p>
+            <p class="text-light">
+               {{quiz.description}}
+            </p>
+            <p> <span class="material-symbols-outlined inline-icons me-2">
+               format_list_numbered
+               </span>Total Questions : <span class="fw-bold">{{quiz.total_questions}}</span>
+            </p>
+            <p><span class="material-symbols-outlined inline-icons me-2">
+               military_tech
+               </span> Marks : <span class="fw-bold">{{quiz.total_marks_obtained}} / {{ quiz.total_marks}}</span>
+            </p>
+            <p> <span class="material-symbols-outlined inline-icons me-2">
+               timer
+               </span> Time taken : <span id="timetaken" class="fw-bold"></span>
+            </p>
+         </div>
+         <div class="col-md-6">
+            <p><span class="material-symbols-outlined inline-icons me-2">
+               history
+               </span>Started : <span class="fw-bold">{{quiz.starts}}</span>
+            </p>
+            <p><span class="material-symbols-outlined inline-icons me-2">
+               timer_off
+               </span>Ended : <span class="fw-bold">{{quiz.ends}}</span>
+            </p>
+            <p> <span class="material-symbols-outlined inline-icons me-2">
+               timelapse
+               </span>Duration : <span class="fw-bold">{{ quiz.duration}}</span>
+            </p>
+            <P><span class="material-symbols-outlined inline-icons me-2">
+               alarm_on
+               </span>Submitted on : {{quiz.submission_time}}
+            </P>
+         </div>
+      </div>
+   </div>
+   {% for question in questions  %}
+   <div class="questionInd container mb-2 shadow-sm p-3 border border-2 rounded border-opacity-75 {% if question.student_answer == question.answer  %} border-success {% else %} border-danger {% endif %} ">
+      <div>
+         <div class="d-flex justify-content-between mb-3">
+            <div class="fw-bold">
+               <span><span class="fw-bold fs-5">{{forloop.counter}}.</span> <span class="me-3"> {% autoescape off %}{{question.question}}{% endautoescape %} </span>{{question.marks}} marks
+            </div>
+            {% if question.student_answer == question.answer  %} <span class="text-success fw-bold"> <img class="mb-1" height ="18" src="{% static 'images/icon/tick.png' %}" alt=""> Correct </span> {% else %} <span class="text-danger fw-bold"> <img height ="16" class="mb-1" src="{% static 'images/icon/cross.png' %}" alt=""> Incorrect </span>  {% endif %} 
+         </div>
+         <div>
+            <p {% if question.student_answer == question.answer and question.answer == 'A' %} class="alert alert-success fw-bold" {% elif question.student_answer != question.answer and question.student_answer == 'A' %} class="alert alert-danger fw-bold" {% else %} class="alert alert-light border" {% endif %} style="padding: 0.60rem !important">A : {% autoescape off %}{{question.option1}}{% endautoescape %}</p>
+            <p {% if question.student_answer == question.answer and question.answer == 'B' %} class="alert alert-success fw-bold" {% elif question.student_answer != question.answer and question.student_answer == 'B' %} class="alert alert-danger fw-bold" {% else %} class="alert alert-light border" {% endif %} style="padding: 0.60rem !important">B : {% autoescape off %}{{question.option2}}{% endautoescape %} </p>
+            <p {% if question.student_answer == question.answer and question.answer == 'C' %} class="alert alert-success fw-bold" {% elif question.student_answer != question.answer and question.student_answer == 'C' %} class="alert alert-danger fw-bold" {% else %} class="alert alert-light border" {% endif %} style="padding: 0.60rem !important">C : {% autoescape off %}{{question.option3}}{% endautoescape %} </p>
+            <p {% if question.student_answer == question.answer and question.answer == 'D' %} class="alert alert-success fw-bold" {% elif question.student_answer != question.answer and question.student_answer == 'D' %} class="alert alert-danger fw-bold" {% else %} class="alert alert-light border" {% endif %} style="padding: 0.60rem !important">D : {% autoescape off %}{{question.option4}}{% endautoescape %} </p>
+         </div>
+      </div>
+      <div>
+         {% if  not question.student_answer %}
+         <span class="fw-bold" style="font-size:15px"> You did not answer!</span>
+         {% endif %}
+      </div>
+      <div style="font-size: 14px;">
+         Correct answer is <span class="fw-bold "> {{ question.answer }} : {% autoescape off %}{{question.get_answer}}{% endautoescape %}</span>
+      </div>
+      {% if question.explanation %}
+      <div class="mt-2 bg-warning bg-opacity-10 p-2 border-start border-2 border-warning" style="font-size:smaller">
+         <span class="fw-bold">Explanation : </span>{{question.explanation}}
+      </div>
+      {% endif %}
+   </div>
+   {% endfor %}
+</div>
+<script>
+   let questionInd = document.querySelectorAll('.questionInd');
+   anime({
+      targets: questionInd,
+      opacity: [0, 1],
+      easing: 'easeInOutQuad',
+      duration: 1500,
+      delay: function (el, i) {
+         return i * 250;
+      }
+   });
+   
+   
+   let time_taken = {{ quiz.time_taken }};
+   function convertTime(timetaken) {
+       var hours = Math.floor(timetaken / 3600);
+       var minutes = Math.floor((timetaken - (hours * 3600)) / 60);
+       var seconds = timetaken - (hours * 3600) - (minutes * 60);
+         seconds = Math.floor(seconds);
+       if (hours < 10) {
+           hours = "0" + hours;
+       }
+       if (minutes < 10) {
+           minutes = "0" + minutes;
+       }
+       if (seconds < 10) {
+           seconds = "0" + seconds;
+       }
+       if (hours == 0 && minutes == 0) {
+           return seconds + " seconds";
+       } else if (hours == 0) {
+           return minutes + ':' + seconds + " minutes";
+       } else {
+           return hours + ':' + minutes + ':' + seconds + " hours";
+       }
+   }
+   document.getElementById('timetaken').innerHTML = convertTime(time_taken);
+</script>
+{% endblock %}

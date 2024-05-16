@@ -62,7 +62,7 @@
                <tr>
                   <th scope="row">{{forloop.counter}}</th>
                   <td class="fw-bold">
-                     <a href="">{{quizP.title}}</a>
+                     <a href="{% url 'quiz-result' course.code quizP.pk %}">{{quizP.title}}</a>
                   </td>
                   <td>{{quizP.ends}}</td>
                   <td class="fw-bold marks">{{quizP.total_marks_obtained}}/ {{ quizP.total_marks}}</td>

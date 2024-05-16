@@ -73,8 +73,13 @@ class Question(models.Model):
             'C': self.option3,
             'D': self.option4,
         }
-        return case[self.anwser]
+        return case[self.answer]
 
+    def total_correct_answers(self):
+        return StudentAnswer.objects.filter(question=self, answer=self.answer).count()
+
+    def total_wrong_answers(self):
+        return StudentAnswer.objects.filter(question=self).exclude(answer=self.answer).count()
 
 class StudentAnswer(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
